@@ -17,12 +17,12 @@ Ces données peuvent ensuite être combinées ou comparées avec d'autres jeux d
 ### Manipulation des données
 
 Lors de la sélection des données à visualiser :
-* L'utilisateur peut appliquer plusieurs filtres temporels :
-** Année(s)
-** Mois
-** Jour(s) de la semaine
-** Plages horaires
-* L'utilisateur peut additionner ou soustraire plusieurs jeux de données :
-** Une addition correspond à l'union des évenements des deux jeux de données
-** Une soustraction correspond à l'union des évenements du premier jeu de données et d'évenements *négatifs* associés aux évenements du deuxième jeu de données
-* L'utilisateur peut sauvegarder toute visualisation sous la forme d'un nouveau jeu de données qui pourra être manipulé à son tour
+1. L'utilisateur peut appliquer plusieurs filtres temporels :
+ * Année(s)
+ * Mois
+ * Jour(s) de la semaine
+ * Plages horaires
+2. L'utilisateur peut additionner ou soustraire plusieurs jeux de données :
+ * Une addition correspond à l'union des évenements des deux jeux de données
+ * Une soustraction correspond à l'union des évenements du premier jeu de données et d'évenements *négatifs* associés aux évenements du deuxième jeu de données
+3. L'utilisateur peut sauvegarder toute visualisation sous la forme d'un nouveau jeu de données qui pourra être manipulé à son tour
