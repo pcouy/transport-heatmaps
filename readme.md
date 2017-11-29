@@ -2,7 +2,7 @@
 
 ## Objectif
 
-Produire une visualisation interactive avec d3.js permettant d'afficher des heatmaps d'évenements, avec la possibilité de combiner ou comparer plusieurs données. Nous souhaitons produire une visualisation sur une seule page.
+Produire une visualisation interactive avec d3.js permettant d'afficher des heatmaps d'évenements, avec la possibilité de combiner ou comparer plusieurs données. Nous souhaitons produire une visualisation sur une seule page. En plus de la heatmap, nous proposons d'ajouter des groupes d'évenements sous forme de point qui produisent une infobulle au survol de la souris
 
 Les données fournies en entrée sont des fichiers CSV ayant pour colonnes un timestamp, une latitude et une longitude.
 Nous travaillerons avec les données des pickups Uber à New York
@@ -26,3 +26,12 @@ Lors de la sélection des données à visualiser :
  * Une addition correspond à l'union des évenements des deux jeux de données
  * Une soustraction correspond à l'union des évenements du premier jeu de données et d'évenements *négatifs* associés aux évenements du deuxième jeu de données
 3. L'utilisateur peut sauvegarder toute visualisation sous la forme d'un nouveau jeu de données qui pourra être manipulé à son tour
+4. L'utilisateur peut afficher la correlation temporelle de deux jeux de données
+
+### Manipulation de la carte
+
+L'utilisateur doit pouvoir se déplacer et zoomer librement sur la carte, et la visualisation doit s'adapter de la manière suivante :
+
+* L'échelle de couleur doit s'adapter à l'amplitude des données présentes sur la carte
+* Les groupes évenements se regrouppent selon le niveau de zoom pour que la carte reste intelligible
+* 
