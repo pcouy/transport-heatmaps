@@ -2,6 +2,9 @@
 <head>
   <meta charset="utf-8">
   <script src="https://d3js.org/d3.v4.min.js"></script>
+  <script src="https://d3js.org/d3-array.v1.min.js"></script>
+  <script src="https://d3js.org/d3-geo.v1.min.js"></script>
+  <script src="https://unpkg.com/topojson@3"></script>
   <style>
     body { margin:0;position:fixed;top:0;right:0;bottom:0;left:0; }
   </style>
@@ -22,7 +25,7 @@
     // On rajoute un groupe englobant toute la visualisation pour plus tard
     var g = svg.append( "g" );
 
-    var projection = d3.geoConicConformal().center([2.454071, 46.279229]).scale(2800);
+    var projection = d3.geoMercator().center([-74.0438, 40.6901]).scale(50000);
     
     // On definie une echelle de couleur
 		var color = d3.scaleQuantize()  
@@ -70,14 +73,20 @@
                  .projection(projection);
     
     
-    d3.csv("GrippeFrance2014.csv", function(data) {
+    d3.csv("data/nyc-seven-major-felony-offenses-by-precinct-2000-2015.csv", function(data) {
     	color.domain([0, 200]);
+    	data = data.filter(d=>d.CRIME=="ROBBERY");
+    	
+    	console.log(data);
       /*color.domain([
 					d3.min(data, function(d) { return d.somme2014; }), 
 					d3.max(data, function(d) { return d.somme2014; })
 				]);*/
-
-      d3.json("", function(json) {
+				
+      d3.json("data/nyc_police_precincts-topojson.json", function(json) {
+		console.log(json);
+		var geoJson = topojson.feature(json,json.objects.nyc_police_precincts).features;
+		console.log(geoJson);
         //On fusionne les donnees avec le GeoJSON des regions
         for (var i = 0; i < data.length; i++) {
           
@@ -92,25 +101,25 @@
           
           //console.log(data[i])
           //Nom de la region
-          var dataRegion = data[i].region;
+          var dataRegion = data[i].PCT;
           //var dataValue = parseFloat(data[i].somme2014);
           console.log(dataValue)
           
           //var dataValue = d3.sum(parseFloat(data[i]));
           
        	//Recherche de l'etat dans le GeoJSON
-          for (var j = 0; j < json.features.length; j++) {
-            var jsonRegion = json.features[j].properties.nom;
+          for (var j = 0; j < geoJson.length; j++) {
+            var jsonRegion = geoJson[j].properties.nom;
             if (dataRegion == jsonRegion) {
-              json.features[j].properties.value = dataValue;
+              geoJson[j].properties.value = dataValue;
                     //Pas besoin de chercher plus loin
                     break;
                 }
             }
         }
-
+		console.log(geoJson);
         g.selectAll("path")
-            .data(json.features)
+            .data(geoJson)
             .enter()
             .append("path")
             .attr("d", path)
