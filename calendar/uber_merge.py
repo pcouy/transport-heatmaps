@@ -11,6 +11,6 @@ for currentFile in currentDirectory.glob(currentPattern):
 
 result = pd.concat(merged)
 result.rename(columns={'Date/Time' : 'datetime'}, inplace=True)
-result = result.sample(frac=0.005)
+result = result.sample(frac=0.0001)
 
 result.to_csv('data/uber_all_data.csv')

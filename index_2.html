@@ -23,29 +23,28 @@
 </head>
 
 <body>
-	<div id="article">
+	<article>
     <header>
       <span id="info">info</span> 
     </header>
 	<svg width="800" height="600" id="svgMap"></svg>
     <section id="heatmap" width="800" height="600" ></section>
-  </div> 
+  </article> 
 
   <script> d3.eesur = {}; //namespace  </script>
   <script src="d3_code_heatmap_cal.js"></script>
   <script>
-	  
-      var parseDate = d3.timeParse('%m/%d/%Y');
 	  (function(){
 		  'use strict';
-d3.csv("calendar/data/uber_all_data.csv", function(data) {
+d3.csv("data/nyc-seven-major-felony-offenses-by-precinct-2000-2015.csv", function(data) {
+	data = data.filter(d=>d.CRIME=="ROBBERY");
 	data = data.map(function(d){
-		d.latitude = d.Lat;
-		d.longitude = d.Lon;
-		d.time_begin = parseDate(d.datetime.split(' ')[0]).getTime()/1000;
-		d.time_end = parseDate(d.datetime.split(' ')[0]).getTime()/1000+3600;
-		d.value = 1;
-		return d;
+		return { 
+			polygon_id: d['PCT'], 
+			value: d["2014"], 
+			time_begin: 1388534400,
+			time_end: 1420070399
+		}
 	});
 	d3.json("data/nyc_police_precincts-topojson.json", function(json) {
 		var geoJson = topojson.feature(json,json.objects.nyc_police_precincts).features;
@@ -76,7 +75,7 @@ d3.csv("calendar/data/uber_all_data.csv", function(data) {
 						}
 		 *points : liste d'objets possédant au moins un attribut latitude et un attribut longitude
 		*/
-		data = coordsToPolygonId(data, geoJson);
+		
 		plotMap(geoJson, data, "svgMap");
 		plotCalendar(data, "heatmap");
 	});

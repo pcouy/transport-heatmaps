@@ -81,6 +81,11 @@ function d3_rebind(target, source, method) {
                         .attr('x', function(d) { return week(d) * sizeByDay; })
                         .attr('y', function(d) { return day(d) * sizeByDay; });
 
+                rect.on('click', function (d) {
+                    console.log("Pressed rect fucker")
+                    console.log(d)
+                });
+
                 year.selectAll('.month')
                     .data(function (d) { 
                         return d3.timeMonths(new Date(d, 0, 1), new Date(d + 1, 0, 1)); 

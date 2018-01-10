@@ -47,7 +47,11 @@ function plotCalendar(data, svgId){
     // render chart
     d3.select('#heatmap')
             .datum(nestedData)
-            .call(heatChart);
+            .call(heatChart)
+            .on("click", function() {
+            console.log("rect");
+            d3.event.stopPropagation();
+            });
 
     }
 
