@@ -2,148 +2,37 @@
 <head>
   <meta charset="utf-8">
   <script src="https://d3js.org/d3.v4.min.js"></script>
+  <script src="https://d3js.org/d3-scale-chromatic.v0.3.min.js"></script>
   <script src="https://d3js.org/d3-array.v1.min.js"></script>
   <script src="https://d3js.org/d3-geo.v1.min.js"></script>
   <script src="https://unpkg.com/topojson@3"></script>
+  <script src="plotMap.js"></script>
   <style>
     body { margin:0;position:fixed;top:0;right:0;bottom:0;left:0; }
   </style>
 </head>
 
 <body>
+	<svg width="800" height="600" id="svgMap"></svg>
   <script>
-		var width = 700,
-  		  height = 580,
-    		tt_width = 80,
-        tt_height = 58;
-
-		var svg = d3.select( "body" )
-  		.append( "svg" )
-		  .attr( "width", width )
-		  .attr( "height", height );
-    
-    // On rajoute un groupe englobant toute la visualisation pour plus tard
-    var g = svg.append( "g" );
-
-    var projection = d3.geoMercator().center([-74.0438, 40.6901]).scale(50000);
-    
-    // On definie une echelle de couleur
-		var color = d3.scaleQuantize()  
-    			.range(["rgb(237,248,233)",
-									"rgb(186,228,179)",
-                  "rgb(116,196,118)",
-                  "rgb(49,163,84)",
-                  "rgb(0,109,44)"]);
-    
-    var tooltip = d3.select("body")
-    .append("div")
-    .style("position", "absolute")
-    //.style("z-index", "10")
-    .style("visibility", "hidden")
-    .style("background", "lightsteelblue")
-    .style("border-radius", "3px")
-    .text("");
-    
-    function mouseovertooltip(d){
-     d3.select(this)
-    		.style("fill-opacity", 0.4)
-    return tooltip.style("visibility", "visible");}
-    
-    function mousemovetooltip(d){
-   	tooltip.text(d.properties.nom + " : " + d.properties.value)
-    return tooltip.style("top",
-    (d3.event.pageY-10)+"px").style("left",(d3.event.pageX+10)+"px");}
-    
-    function mouseouttooltip(d){
-      d3.select(this)
-    	.style("fill", function(d) {
-                //on prend la valeur recupere plus haut
-                var value = d.properties.value;
-                if (value) {
-                    return color(value);
-                } else { 
-                    // si pas de valeur alors en gris
-                    return "#ccc";
-                }
-      	})
-      .style("fill-opacity", 1.0)
-    return tooltip.style("visibility", "hidden");}
-    
-    var path = d3.geoPath() // d3.geo.path avec d3 version 3
-                 .projection(projection);
-    
-    
-    d3.csv("data/nyc-seven-major-felony-offenses-by-precinct-2000-2015.csv", function(data) {
-    	color.domain([0, 200]);
-    	data = data.filter(d=>d.CRIME=="ROBBERY");
-    	
-    	console.log(data);
-      /*color.domain([
-					d3.min(data, function(d) { return d.somme2014; }), 
-					d3.max(data, function(d) { return d.somme2014; })
-				]);*/
-				
-      d3.json("data/nyc_police_precincts-topojson.json", function(json) {
-		console.log(json);
+d3.csv("data/nyc-seven-major-felony-offenses-by-precinct-2000-2015.csv", function(data) {
+	data = data.filter(d=>d.CRIME=="ROBBERY");
+	data = data.map(function(d){
+		return { 
+			polygon_id: d['PCT'], 
+			value: d["2014"] 
+		}
+	});
+	d3.json("data/nyc_police_precincts-topojson.json", function(json) {
 		var geoJson = topojson.feature(json,json.objects.nyc_police_precincts).features;
 		console.log(geoJson);
-        //On fusionne les donnees avec le GeoJSON des regions
-        for (var i = 0; i < data.length; i++) {
-          
-          var dataValue = 0;
-          for (var k = 0; k<d3.keys(data[i]).length; k++)
-            {
-              var slice = d3.keys(data[i])[k].slice(3, 5);
-              if (slice == "11"){
-                dataValue = dataValue + parseFloat(data[i][d3.keys(data[i])[k]]);
-              }
-            }
-          
-          //console.log(data[i])
-          //Nom de la region
-          var dataRegion = data[i].PCT;
-          //var dataValue = parseFloat(data[i].somme2014);
-          console.log(dataValue)
-          
-          //var dataValue = d3.sum(parseFloat(data[i]));
-          
-       	//Recherche de l'etat dans le GeoJSON
-          for (var j = 0; j < geoJson.length; j++) {
-            var jsonRegion = geoJson[j].properties.nom;
-            if (dataRegion == jsonRegion) {
-              geoJson[j].properties.value = dataValue;
-                    //Pas besoin de chercher plus loin
-                    break;
-                }
-            }
-        }
-		console.log(geoJson);
-        g.selectAll("path")
-            .data(geoJson)
-            .enter()
-            .append("path")
-            .attr("d", path)
-        		.style("stroke", "white")
-            .style("fill", function(d) {
-                //on prend la valeur recupere plus haut
-                var value = d.properties.value;
-                if (value) {
-                    return color(value);
-                } else { 
-                    // si pas de valeur alors en gris
-                    return "#ccc";
-                }
-            })
-            .on("mouseover", function(d){
-                  mouseovertooltip.call(this, d);
-              })
-            .on("mousemove", function(d){
-                  mousemovetooltip.call(this, d);
-              })
-            .on("mouseout", function(d){
-                  mouseouttooltip.call(this, d);
-      			});
-      });
+		geoJson = geoJson.map(function(d){
+			d.polygon_id = d.properties.Precinct;
+			return d;
+		});
+		
+		plotMap(geoJson, data, "svgMap");
+	});
 });
   </script>
 </body>
