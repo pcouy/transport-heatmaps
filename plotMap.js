@@ -93,12 +93,25 @@ function plotMap(geoJson, data, svgId){
 	
 	color.domain(d3.extent( geoJson.map( d=>parseFloat(d.properties.value) ) ));
 	
+	g.selectAll("path").data(geoJson).exit().remove();
+	
 	g.selectAll("path")
 		.data(geoJson)
 		.enter()
 		.append("path")
 		.attr("d", path)
 			.style("stroke", "white")
+		.on("mouseover", function(d){
+			  mouseovertooltip.call(this, d);
+		  })
+		.on("mousemove", function(d){
+			  mousemovetooltip.call(this, d);
+		  })
+		.on("mouseout", function(d){
+			  mouseouttooltip.call(this, d);
+		})
+		.merge(g.selectAll("path").data(geoJson))
+		.transition(500)
 		.style("fill", function(d) {
 			//on prend la valeur recupere plus haut
 			var value = d.properties.value;
@@ -108,14 +121,5 @@ function plotMap(geoJson, data, svgId){
 				// si pas de valeur alors en gris
 				return "#ccc";
 			}
-		})
-		.on("mouseover", function(d){
-			  mouseovertooltip.call(this, d);
-		  })
-		.on("mousemove", function(d){
-			  mousemovetooltip.call(this, d);
-		  })
-		.on("mouseout", function(d){
-			  mouseouttooltip.call(this, d);
 		});
 }

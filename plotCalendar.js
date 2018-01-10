@@ -49,5 +49,11 @@ function plotCalendar(data_raw, idSvg) {
           d3.select('#'+idSvg)
               .datum(nestedData)
               .call(heatChart);
-
+		
+		d3.selectAll('.day').on('click',function(d){
+			var targetTime = d.getTime()/1000;
+			var filtering = entry=>( entry.time_begin<=targetTime && entry.time_end>=targetTime );
+			plotMap(geoJson, data_raw.filter(filtering), "svgMap");
+			console.log(data_raw.filter(filtering));
+		});
   }
