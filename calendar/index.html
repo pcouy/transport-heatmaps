@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>d3 | reusable heatmap calendar</title> 
+  <meta name="author" content="Louis Manhès">
+  
+  <link rel="stylesheet" href="main.css">
+  <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/3.10.1/lodash.min.js" charset="utf-8"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.6/moment.min.js"></script>
+</head>
+<body>
+
+  <article>
+    <header>
+      <span id="info">info</span> 
+    </header>
+    <section id="heatmap"></section>
+  </article> 
+
+  <script> d3.eesur = {}; //namespace  </script>
+  <script src="d3_code_heatmap_cal.js"></script>
+  <script>
+  // *****************************************
+  // render chart
+  // *****************************************
+  (function() {
+      'use strict';
+      
+      var nestedData;
+      var parseDate = d3.time.format('%m/%d/%Y').parse;
+
+      // create chart
+      var heatChart = d3.eesur.heatmap()
+          .colourRangeStart('#FDBB30')
+          .colourRangeEnd('#EE3124')
+          .height(800)
+          .startYear('2014')
+          .endYear('2014')
+          .on('_hover', function (d, i) {
+              var f = d3.time.format('%B %d, %Y');
+              d3.select('#info')
+                  .text(function () {
+                      return 'date: ' + f(d) + ' | value: ' + nestedData[d];
+                  });
+          });
+
+      // apply after nesting data
+      d3.csv('data/uber_all_data.csv', function(error, data) {
+      //d3.json('heatmap_data.json', function(error, data) {
+
+          if (error) return console.warn(error);
+          
+          // remplacer sum par moyenne valeurs absolues
+          nestedData = d3.nest()
+              .key(function (d) { 
+                console.log(d.datetime)
+                console.log(parseDate(d.datetime.split(' ')[0]))
+                return parseDate(d.datetime.split(' ')[0]); })
+              .rollup(function (n) { 
+                  return n.length;
+              })
+              .map(data);
+
+          console.log("fucking nestedData");
+          console.log(nestedData);
+
+          // render chart
+          d3.select('#heatmap')
+              .datum(nestedData)
+              .call(heatChart);
+
+      });
+
+  }());
+
+  d3.select(self.frameElement).style('height', '900px');
+
+  </script>
+
+</body>
+
+</html>
+
+
