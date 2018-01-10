@@ -16,7 +16,6 @@ function d3_rebind(target, source, method) {
   };
 }
 
-
 function plotCalendar(data, svgId){
 
     console.log(data);
