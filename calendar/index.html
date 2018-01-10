@@ -38,14 +38,7 @@
           .colourRangeEnd('#EE3124')
           .height(800)
           .startYear('2014')
-          .endYear('2015')
-          .on('_hover', function (d, i) {
-              var f = d3.timeFormat('%B %d, %Y');
-              d3.select('#info')
-                  .text(function () {
-                      return 'date: ' + f(d) + ' | value: ' + nestedData[d];
-                  });
-          });
+          .endYear('2015');
 
       // apply after nesting data
       d3.csv('data/uber_all_data.csv', function(error, data) {
@@ -56,8 +49,6 @@
           // remplacer sum par moyenne valeurs absolues
           nestedData = d3.nest()
               .key(function (d) { 
-                console.log(d.datetime)
-                console.log(parseDate(d.datetime.split(' ')[0]))
                 return parseDate(d.datetime.split(' ')[0]); })
               .rollup(function (n) { 
                   return n.length;

@@ -30,7 +30,7 @@ function d3_rebind(target, source, method) {
             width = 950,
             height = 475;
 
-        var dispatch = d3.dispatch('_hover');
+        var dispatch = d3.dispatch('mouseover');
 
         function exports(_selection) {
             _selection.each(function(nestedData) {
@@ -79,7 +79,7 @@ function d3_rebind(target, source, method) {
                         .attr('width', sizeByDay)
                         .attr('height', sizeByDay)
                         .attr('x', function(d) { return week(d) * sizeByDay; })
-                        .attr('y', function(d) { return day(d) * sizeByDay; })
+                        .attr('y', function(d) { return day(d) * sizeByDay; });
 
                 year.selectAll('.month')
                     .data(function (d) { 
@@ -139,13 +139,18 @@ function d3_rebind(target, source, method) {
                 colour.domain(d3.extent(d3.values(nestedData)));
 
                 rect.filter(function (d) {
-						console.log(String(d))
                         return "$"+d in nestedData; 
                     })
                     .style('fill', function (d) { 
                         return colour(nestedData["$"+d]); 
                     })
-                    .on('mouseover', dispatch._hover);
+                    .on('mouseover', function (d, i) {
+						  var f = d3.timeFormat('%B %d, %Y');
+						  d3.select('#info')
+							  .text(function () {
+								  return 'date: ' + f(d) + ' | value: ' + nestedData["$"+d];
+							  });
+					  });
             });
         }
         
