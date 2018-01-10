@@ -7,6 +7,7 @@
   <script src="https://d3js.org/d3-geo.v1.min.js"></script>
   <script src="https://unpkg.com/topojson@3"></script>
   <script src="plotMap.js"></script>
+  <script src="coordsToPolygonId.js"></script>
   <style>
     body { margin:0;position:fixed;top:0;right:0;bottom:0;left:0; }
   </style>
@@ -20,7 +21,9 @@ d3.csv("data/nyc-seven-major-felony-offenses-by-precinct-2000-2015.csv", functio
 	data = data.map(function(d){
 		return { 
 			polygon_id: d['PCT'], 
-			value: d["2014"] 
+			value: d["2014"], 
+			time_begin: 1388534400,
+			time_end: 1420070399
 		}
 	});
 	d3.json("data/nyc_police_precincts-topojson.json", function(json) {
@@ -30,6 +33,26 @@ d3.csv("data/nyc-seven-major-felony-offenses-by-precinct-2000-2015.csv", functio
 			d.polygon_id = d.properties.Precinct;
 			return d;
 		});
+		window.geoJson = geoJson; //Pour manipuler geoJson dans la console
+		
+		/*###############################
+		Les données sont à présent pré-formattées pour être utilisées
+		Avec les fonctions auxilliaires définies :
+		 * plotMap(geoJson, data, idSvg)
+		 * coordsToPolygonId(points, geoJson)
+		 
+		Les données doivent être formattées de la manière suivante :
+		 * geoJson :  une liste geoJSON dont chaque objet a un attribut polygon_id
+					qui identifie les polygones de manière unique
+		 * data : liste d'objets de la forme :
+						{
+							polygon_id: ___,
+							value: ###,
+							time_begin: unix_timestamp (int),
+							time_end: unix_timestamp (int)
+						}
+		 *points : liste d'objets possédant au moins un attribut latitude et un attribut longitude
+		*/
 		
 		plotMap(geoJson, data, "svgMap");
 	});
