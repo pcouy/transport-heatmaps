@@ -1,3 +1,6 @@
+
+d3.calendar_module = {}; // declare namespace
+
 function rebind(target, source) {
   var i = 1,
     n = arguments.length,
@@ -13,14 +16,48 @@ function d3_rebind(target, source, method) {
   };
 }
 
-(function() {
-    'use strict';
+
+function plotCalendar(data, svgId){
+
+    console.log(data);
+    svg = d3.select("#" + svgId);
+    var width = svg.attr("width");
+    var height = svg.attr("height");
+    console.log(width);
+    console.log(height);
+
+    // create chart
+    var heatChart = d3.calendar_module.heatmap()
+          .colourRangeStart('#FDBB30')
+          .colourRangeEnd('#EE3124')
+          .height(800)
+          .startYear('2014')
+          .endYear('2015');
+
+    var nestedData;
+    var parseDate = d3.timeParse('%m/%d/%Y');
+
+    nestedData = d3.nest()
+              .key(function (d) { 
+                return parseDate(d.datetime.split(' ')[0]); })
+              .rollup(function (n) { 
+                  return n.length;
+              })
+              .map(data);
+
+    // render chart
+    d3.select('#heatmap')
+            .datum(nestedData)
+            .call(heatChart);
+
+    }
+
 
 // *****************************************
 // reusable heat-map chart
 // *****************************************
 
-    d3.eesur.heatmap = function module() {
+    d3.calendar_module.heatmap = function module() {
 
         // input vars for getter setters
         var startYear = 2014,
@@ -190,6 +227,3 @@ function d3_rebind(target, source, method) {
         return exports;
 
     };
-
-
-}());

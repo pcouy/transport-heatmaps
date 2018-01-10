@@ -20,54 +20,14 @@
     <section id="heatmap"></section>
   </article> 
 
-  <script> d3.eesur = {}; //namespace  </script>
-  <script src="d3_code_heatmap_cal.js"></script>
+  <script src="plotCalendar.js"></script>
+  <svg width="800" height="600" id="svgCalendar"></svg>
   <script>
-  // *****************************************
-  // render chart
-  // *****************************************
-  (function() {
-      'use strict';
       
-      var nestedData;
-      var parseDate = d3.timeParse('%m/%d/%Y');
-
-      // create chart
-      var heatChart = d3.eesur.heatmap()
-          .colourRangeStart('#FDBB30')
-          .colourRangeEnd('#EE3124')
-          .height(800)
-          .startYear('2014')
-          .endYear('2015');
-
-      // apply after nesting data
       d3.csv('data/uber_all_data.csv', function(error, data) {
-      //d3.json('heatmap_data.json', function(error, data) {
-
           if (error) return console.warn(error);
-          
-          // remplacer sum par moyenne valeurs absolues
-          nestedData = d3.nest()
-              .key(function (d) { 
-                return parseDate(d.datetime.split(' ')[0]); })
-              .rollup(function (n) { 
-                  return n.length;
-              })
-              .map(data);
-
-          console.log("fucking nestedData");
-          console.log(nestedData);
-
-          // render chart
-          d3.select('#heatmap')
-              .datum(nestedData)
-              .call(heatChart);
-
+          plotCalendar(data, "svgCalendar");
       });
-
-  }());
-
-  d3.select(self.frameElement).style('height', '900px');
 
   </script>
 
