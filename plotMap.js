@@ -5,12 +5,9 @@ function flatten(arr) {
 }
 
 function plotMap(geoJson, data, svgId){
-	console.log(data);
 	svg = d3.select("#"+svgId);
 	var width = svg.attr("width");
 	var height = svg.attr("height");
-	console.log(width);
-	console.log(height);
 	
 	// On rajoute un groupe englobant toute la visualisation pour plus tard
     var g = svg.append( "g" );
@@ -19,17 +16,21 @@ function plotMap(geoJson, data, svgId){
     var projection = d3.geoMercator();
     //On calcule les paramètres pour la projection
     var allCoords = flatten(geoJson.map(d=>d.geometry.coordinates));
-	var latAmplitude = d3.extent(allCoords, d=>d[0]);
-	var longAmplitude = d3.extent(allCoords, d=>d[1]);
-	var latCenter = ( latAmplitude[0] + latAmplitude[1] ) / 2;
+	var longAmplitude = d3.extent(allCoords, d=>d[0]);
+	var latAmplitude = d3.extent(allCoords, d=>d[1]);
 	var longCenter = ( longAmplitude[0] + longAmplitude[1] ) / 2;
-	var latScale = 45*width/(latAmplitude[1] - latAmplitude[0]);
-	var longScale = 45*height/(longAmplitude[1] - longAmplitude[0]);
-	projection.center([latCenter, longCenter]).translate([width/2,height/2]).scale(d3.min([latScale, longScale]));
+	var latCenter = ( latAmplitude[0] + latAmplitude[1] ) / 2;
+	var longScale = 45*width/(longAmplitude[1] - longAmplitude[0]);
+	var latScale = 45*height/(latAmplitude[1] - latAmplitude[0]);
+	projection.center([longCenter, latCenter]).translate([width/2,height/2]).scale(d3.min([longScale, latScale]));
+	
+	geoJson = geoJson.map(function(d){
+		d.properties.value = 0;
+		return d;
+	});
     
     // On definie une echelle de couleur
-	var color = d3.scaleSequential(d3.interpolateGreens)
-					.domain(d3.extent( data.map( d=>parseFloat(d.value) ) ));
+	var color = d3.scaleSequential(d3.interpolateGreens);
     
     var tooltip = d3.select("body")
 		.append("div")
@@ -47,7 +48,7 @@ function plotMap(geoJson, data, svgId){
 	}
 
 	function mousemovetooltip(d){
-		tooltip.text(d.polygon_id + " : " + d.properties.value)
+		tooltip.text(d.properties.polygon_id + " : " + d.properties.value)
 		return tooltip.style("top",(d3.event.pageY-10)+"px").style("left",(d3.event.pageX+10)+"px");
 	}
 
@@ -81,14 +82,16 @@ function plotMap(geoJson, data, svgId){
 	  
 		//Recherche de l'etat dans le GeoJSON
 		for (var j = 0; j < geoJson.length; j++) {
-			var jsonRegion = geoJson[j].polygon_id;
+			var jsonRegion = geoJson[j].properties.polygon_id;
 			if (String(dataRegion) == String(jsonRegion)) {
-					geoJson[j].properties.value = dataValue;
+					geoJson[j].properties.value += dataValue;
 					//Pas besoin de chercher plus loin
 					break;
 			}
 		}
 	}
+	
+	color.domain(d3.extent( geoJson.map( d=>parseFloat(d.properties.value) ) ));
 	
 	g.selectAll("path")
 		.data(geoJson)
