@@ -6,7 +6,8 @@
   <meta name="author" content="Louis Manhès">
   
   <link rel="stylesheet" href="main.css">
-  <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+  <script src="https://d3js.org/d3.v4.js"></script>
+  <script src="https://d3js.org/d3-scale-chromatic.v0.3.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/3.10.1/lodash.min.js" charset="utf-8"></script>
   <script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.6/moment.min.js"></script>
 </head>
@@ -29,7 +30,7 @@
       'use strict';
       
       var nestedData;
-      var parseDate = d3.time.format('%m/%d/%Y').parse;
+      var parseDate = d3.timeParse('%m/%d/%Y');
 
       // create chart
       var heatChart = d3.eesur.heatmap()
@@ -37,9 +38,9 @@
           .colourRangeEnd('#EE3124')
           .height(800)
           .startYear('2014')
-          .endYear('2014')
+          .endYear('2015')
           .on('_hover', function (d, i) {
-              var f = d3.time.format('%B %d, %Y');
+              var f = d3.timeFormat('%B %d, %Y');
               d3.select('#info')
                   .text(function () {
                       return 'date: ' + f(d) + ' | value: ' + nestedData[d];

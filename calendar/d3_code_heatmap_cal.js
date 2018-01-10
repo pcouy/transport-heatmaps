@@ -1,3 +1,18 @@
+function rebind(target, source) {
+  var i = 1,
+    n = arguments.length,
+    method;
+  while (++i < n) target[method = arguments[i]] = d3_rebind(target, source, source[method]);
+  return target;
+};
+
+function d3_rebind(target, source, method) {
+  return function() {
+    var value = method.apply(source, arguments);
+    return value === source ? target : value;
+  };
+}
+
 (function() {
     'use strict';
 
@@ -20,8 +35,7 @@
         function exports(_selection) {
             _selection.each(function(nestedData) {
 
-                var colour = d3.scale.linear()
-                    .range([colourRangeStart, colourRangeEnd]);
+                var colour = d3.scaleSequential(d3.interpolateGreens);
 
                 var margin = {top: 20, right: 30, bottom: 20, left: 20};
                 // update width and height to use margins for axis
@@ -32,16 +46,14 @@
                     sizeByYear = height/years.length+1,
                     sizeByDay = d3.min([sizeByYear/8,width/54]),
                     day = function(d) { return (d.getDay() + 6) % 7; },
-                    week = d3.time.format('%W'),
-                    date = d3.time.format('%b %d');
+                    week = d3.timeFormat('%W'),
+                    date = d3.timeFormat('%b %d');
                     
                 var svg = d3.select(this)
                     .append('svg')
-                        .attr({
-                           class: 'chart',
-                           width: width + margin.left + margin.right,
-                           height: height + margin.top + margin.bottom
-                        })
+                        .attr('class','chart')
+                        .attr('width', width + margin.left + margin.right)
+                        .attr('height', height + margin.top + margin.bottom)
                     .append('g')
                         .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
 
@@ -52,36 +64,30 @@
                         .attr('transform', function(d,i) { return 'translate(30,' + i * sizeByYear + ')'; });
 
                 year.append('text')
-                    .attr({
-                        class: 'year-title',
-                        transform: 'translate(-38,' + sizeByDay * 3.5 + ')rotate(-90)',
-                        'text-anchor': 'middle',
-                        'font-weight': 'bold'
-                    })
+                    .attr('class', 'year-title')
+                    .attr('transform', 'translate(-38,' + sizeByDay * 3.5 + ')rotate(-90)')
+                    .attr('text-anchor', 'middle')
+                    .attr('font-weight', 'bold')
                     .text(function(d) { return d; });
 
                 var rect = year.selectAll('.day')
                     .data(function (d) { 
-                      return (d === moment().year()) ? d3.time.days(new Date(d, 0, 1), new Date(d , moment().month(), moment().date())) : d3.time.days(new Date(d, 0, 1), new Date(d + 1, 0, 1)); 
+                      return (d === moment().year()) ? d3.timeDays(new Date(d, 0, 1), new Date(d , moment().month(), moment().date())) : d3.timeDays(new Date(d, 0, 1), new Date(d + 1, 0, 1)); 
                     })
                     .enter().append('rect')
-                        .attr({
-                            class: 'day',
-                            width: sizeByDay,
-                            height: sizeByDay,
-                            x: function(d) { return week(d) * sizeByDay; },
-                            y: function(d) { return day(d) * sizeByDay; }
-                        });
+                        .attr('class', 'day')
+                        .attr('width', sizeByDay)
+                        .attr('height', sizeByDay)
+                        .attr('x', function(d) { return week(d) * sizeByDay; })
+                        .attr('y', function(d) { return day(d) * sizeByDay; })
 
                 year.selectAll('.month')
                     .data(function (d) { 
-                        return d3.time.months(new Date(d, 0, 1), new Date(d + 1, 0, 1)); 
+                        return d3.timeMonths(new Date(d, 0, 1), new Date(d + 1, 0, 1)); 
                     })
                     .enter().append('path')
-                        .attr({
-                            class: 'month',
-                            d: monthPath
-                        });
+                        .attr('class', 'month')
+                        .attr('d', monthPath);
 
                 // day and week titles
                 var chartTitles = (function() {
@@ -132,11 +138,12 @@
                 // apply the heatmap colours
                 colour.domain(d3.extent(d3.values(nestedData)));
 
-                rect.filter(function (d) { 
-                        return d in nestedData; 
+                rect.filter(function (d) {
+						console.log(String(d))
+                        return "$"+d in nestedData; 
                     })
                     .style('fill', function (d) { 
-                        return colour(nestedData[d]); 
+                        return colour(nestedData["$"+d]); 
                     })
                     .on('mouseover', dispatch._hover);
             });
@@ -174,7 +181,7 @@
             return this;
         };
 
-        d3.rebind(exports, dispatch, 'on');
+        rebind(exports, dispatch, 'on');
         return exports;
 
     };
