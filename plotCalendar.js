@@ -51,8 +51,22 @@ function plotCalendar(data_raw, idSvg) {
               .call(heatChart);
 		
 		d3.selectAll('.day').on('click',function(d){
-			var targetTime = d.datetime.getTime()/1000;
-			var filtering = entry=>( entry.time_begin<=targetTime && entry.time_end>=targetTime );
+			if(!window.cntrlIsPressed){
+				$('.selected').toggleClass('selected');
+			}
+			$(this).toggleClass('selected');
+			
+			var filtering = function(entry){
+				var result = false;
+				d3.selectAll('.selected').data().forEach(function(d){
+					var targetTime = d.datetime.getTime()/1000;
+					if( entry.time_begin<=targetTime && entry.time_end>=targetTime ){
+						result = true;
+					}
+				});
+				return result;
+			};
+			
 			plotMap(geoJson, data_raw.filter(filtering), "svgMap");
 			console.log(data_raw.filter(filtering));
 		});

@@ -51,3 +51,10 @@ svg text {
   text-transform: uppercase;
   fill: #00B0DD;
 }
+.district{
+	stroke: white;
+}
+.selected{
+	stroke: red !important;
+	stroke-width:5px;
+}

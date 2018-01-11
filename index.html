@@ -4,6 +4,7 @@
   
   <link rel="stylesheet" href="main.css">
   
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
   <script src="https://d3js.org/d3.v4.min.js"></script>
   <script src="https://d3js.org/d3-scale-chromatic.v0.3.min.js"></script>
   <script src="https://d3js.org/d3-array.v1.min.js"></script>
@@ -12,6 +13,7 @@
   <script src="plotMap.js"></script>
   <script src="coordsToPolygonId.js"></script>
   <script src="plotCalendar.js"></script>
+  <script src="datasets.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/3.10.1/lodash.min.js" charset="utf-8"></script>
   <script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.6/moment.min.js"></script>
   
@@ -28,15 +30,22 @@
       <span id="info">info</span> 
     </header>
 	<svg width="800" height="600" id="svgMap"></svg>
-    <section id="heatmap" width="800" height="600" ></section>
+    <svg id="heatmap" width="800" height="600" ></section>
   </div>
-
-  <div id="reset_button">
+  <div id="ui" style="position:absolute;top:40px;right:20px;">
+	 <div id="reset_button">
     <input name="resetButton" 
            type="button" 
            value="Reset"
            onclick="resetData()"/>
 	</div> 
+	<hr>
+	<a href="#!" id="saveMapFilter">Save district filtering as dataset</a><br>
+	<a href="#!" id="saveTimeFilter">Save time filtering as dataset</a>
+	<hr>
+  </div>
+
+ 
 
   <script> d3.eesur = {}; //namespace  </script>
   <script src="d3_code_heatmap_cal.js"></script>
@@ -45,10 +54,24 @@
 
  var orig_data;
  var orig_geojson;
+ window.cntrlIsPressed = false;
+ $(document).keydown(function(event){
+    if(event.which=="17")
+        window.cntrlIsPressed = true;
+});
+
+$(document).keyup(function(){
+    window.cntrlIsPressed = false;
+});
+
 
  function resetData() {
+	 $('.selected').toggleClass('selected');
  	plotMap(orig_geojson, orig_data, "svgMap");
+ 	plotCalendar(orig_data, "heatmap");
 }
+
+	window.datasets = new Map();
 
       var parseDate = d3.timeParse('%m/%d/%Y');
 	  (function(){
@@ -93,7 +116,11 @@ d3.csv("calendar/data/uber_all_data.csv", function(data) {
 		*/
 		data = coordsToPolygonId(data, geoJson);
 		orig_data = data;
-		orig_geojson = geoJson
+		orig_geojson = geoJson;
+		setOrigDataset(orig_data);
+		window.datasets.set("uber_orig", orig_data);
+		displayDatasetPicker();
+		displayDatasetMerger();
 
 		plotMap(geoJson, data, "svgMap");
 		plotCalendar(data, "heatmap");

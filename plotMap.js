@@ -100,7 +100,7 @@ function plotMap(geoJson, data, svgId){
 		.enter()
 		.append("path")
 		.attr("d", path)
-			.style("stroke", "white")
+		.attr("class","district")
 		.on("mouseover", function(d){
 			  mouseovertooltip.call(this, d);
 		  })
@@ -111,7 +111,20 @@ function plotMap(geoJson, data, svgId){
 			  mouseouttooltip.call(this, d);
 		})
 		.on("click",function(d){
-			var filtering = entry=>entry.polygon_id==d.properties.polygon_id;
+			if(!window.cntrlIsPressed){
+				$('.selected').toggleClass('selected');
+			}
+			$(this).toggleClass('selected');
+			
+			var filtering = function(entry){
+				var result = false;
+				d3.selectAll('.selected').data().forEach(function(d){
+					if( entry.polygon_id==d.properties.polygon_id ){
+						result = true;
+					}
+				});
+				return result;
+			};
 			console.log(data.filter(filtering));
 			plotCalendar(data.filter(filtering),"heatmap")
 		})
