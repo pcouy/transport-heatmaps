@@ -10,6 +10,13 @@ body {
 	position: relative;
 	overflow:scroll;
 }
+#ref_heatmap {
+	font-family: "Source Code Pro", Consolas, monaco, monospace;
+	line-height: 1.5;
+	font-weight: 400;
+	position: relative;
+	padding-top: 10px;
+}
 .day {
   fill: #fff;
   stroke: black;
