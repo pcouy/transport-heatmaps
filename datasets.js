@@ -22,7 +22,7 @@ function displayDatasetMerger(){
 		var dataset1 = window.datasets.get( $('#select_merge_1').val() );
 		var dataset2 = window.datasets.get( $('#select_merge_2').val() );
 		var newDataset = dataset1.concat(dataset2);
-		window.dataset.set( prompt("Dataset name ?") , newDataset );
+		window.datasets.set( prompt("Dataset name ?") , newDataset );
 		
 		displayDatasetPicker();
 		displayDatasetMerger();
