@@ -141,7 +141,7 @@ function d3_rebind(target, source, method) {
                 }
 
                 // apply the heatmap colours
-                colour.domain(d3.extent(d3.values(nestedData).map(d=>-d)));
+                colour.domain(d3.extent(d3.values(nestedData).map(d=>$('#toggleDivergingScale').is(':checked')?-d:d)));
 				
 				console.log(rect);
 				rect.exit().remove();
