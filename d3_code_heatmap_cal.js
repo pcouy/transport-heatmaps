@@ -141,8 +141,12 @@ function d3_rebind(target, source, method) {
                 }
 
                 // apply the heatmap colours
-                colour.domain(d3.extent(d3.values(nestedData).map(d=>$('#toggleDivergingScale').is(':checked')?-d:d)));
-				
+                if($('#toggleDivergingScale').is(':checked')){
+					var absMax = d3.max(d3.values(nestedData).map(d=>Math.abs(d)))
+					colour.domain([-absMax,absMax]);
+				}else{
+					colour.domain(d3.extent(d3.values(nestedData)))
+				}
 				console.log(rect);
 				rect.exit().remove();
                 rect.enter().append('rect')

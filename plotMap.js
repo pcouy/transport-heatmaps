@@ -92,7 +92,8 @@ function plotMap(geoJson, data, svgId){
 	}
 	
 	if($('#toggleDivergingScale').is(':checked')){
-		color.domain(d3.extent( geoJson.map( d=>-parseFloat(d.properties.value) ) ));
+		var absMax = d3.max( geoJson.map( d=>Math.abs(parseFloat(d.properties.value)) ) );
+		color.domain([-absMax,absMax]);
 	}else{
 		color.domain(d3.extent( geoJson.map( d=>parseFloat(d.properties.value) ) ));
 	}
