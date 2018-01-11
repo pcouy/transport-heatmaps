@@ -30,7 +30,7 @@ function plotMap(geoJson, data, svgId){
 	});
     
     // On definie une echelle de couleur
-	var color = d3.scaleSequential(d3.interpolateGreens);
+	var color = d3.scaleSequential(!$('#toggleDivergingScale').is(':checked')?d3.interpolateGreens:d3.interpolateRdBu);
     
     var tooltip = d3.select("body")
 		.append("div")
@@ -56,7 +56,7 @@ function plotMap(geoJson, data, svgId){
 		d3.select(this)
 			.style("fill", function(d) {
 				//on prend la valeur recupere plus haut
-				var value = d.properties.value;
+				var value = $('#toggleDivergingScale').is(':checked')?-d.properties.value:d.properties.value;
 				if (value) {
 					return color(value);
 				} else { 
@@ -91,7 +91,12 @@ function plotMap(geoJson, data, svgId){
 		}
 	}
 	
-	color.domain(d3.extent( geoJson.map( d=>parseFloat(d.properties.value) ) ));
+	if($('#toggleDivergingScale').is(':checked')){
+		color.domain(d3.extent( geoJson.map( d=>-parseFloat(d.properties.value) ) ));
+	}else{
+		color.domain(d3.extent( geoJson.map( d=>parseFloat(d.properties.value) ) ));
+	}
+	
 	
 	g.selectAll("path").data(geoJson).exit().remove();
 	
@@ -132,7 +137,7 @@ function plotMap(geoJson, data, svgId){
 		.transition(500)
 		.style("fill", function(d) {
 			//on prend la valeur recupere plus haut
-			var value = d.properties.value;
+			var value = $('#toggleDivergingScale').is(':checked')?-d.properties.value:d.properties.value;
 			if (value) {
 				return color(value);
 			} else { 

@@ -35,7 +35,7 @@ function d3_rebind(target, source, method) {
         function exports(_selection) {
             _selection.each(function(nestedData) {
 
-                var colour = d3.scaleSequential(d3.interpolateGreens);
+                var colour = d3.scaleSequential(!$('#toggleDivergingScale').is(':checked')?d3.interpolateGreens:d3.interpolateRdBu);
 
                 var margin = {top: 20, right: 30, bottom: 20, left: 20};
                 // update width and height to use margins for axis
@@ -141,7 +141,7 @@ function d3_rebind(target, source, method) {
                 }
 
                 // apply the heatmap colours
-                colour.domain(d3.extent(d3.values(nestedData)));
+                colour.domain(d3.extent(d3.values(nestedData).map(d=>-d)));
 				
 				console.log(rect);
 				rect.exit().remove();
@@ -159,7 +159,7 @@ function d3_rebind(target, source, method) {
 							  });
 					  })
 					  .style('fill', function (d) { 
-                        return colour(d.value); 
+                        return colour($('#toggleDivergingScale').is(':checked')?-d.value:d.value); 
                     });
                     
                     
