@@ -48,7 +48,7 @@ function plotMap(geoJson, data, svgId){
 	}
 
 	function mousemovetooltip(d){
-		tooltip.text("District (" + d.properties.polygon_id + ") : " + d.properties.value)
+		tooltip.text(d.properties.polygon_id +  " : " + d.properties.value)
 		return tooltip.style("top",(d3.event.pageY-10)+"px").style("left",(d3.event.pageX+10)+"px");
 	}
 
