@@ -12,16 +12,17 @@ function displayDatasetPicker(){
 
 function displayDatasetComparer(){
 	$('#dataset_comparer').remove();
-	$('#ui').append('<div id="dataset_comparer"><select id="select_compare_1"></select><select id="select_compare_2"></select></div>');
+	$('#ui').append('<div id="dataset_comparer"><select id="select_compare_1"></select><select id="select_compare_2"></select><select id="select_compare_type"><option value="0">Normalize rel to time</option><option value="1">Normalize rel to districts</option></select></div>');
 	for(dataset of window.datasets){
 		$('#select_compare_1').append('<option value="'+dataset[0]+'">'+dataset[0]+'</option>')
 		$('#select_compare_2').append('<option value="'+dataset[0]+'">'+dataset[0]+'</option>')
 	}
 	$('#dataset_comparer').append('<a href="#!" id="compare_link">Compare datasets</a>');
 	$('#compare_link').click(function(){
+		var stdFunc = $('#select_compare_type').val()==0?stdOverTime:stdOverPolygons;
 		var dataset1 = window.datasets.get( $('#select_compare_1').val() );
 		var dataset2 = window.datasets.get( $('#select_compare_2').val() );
-		var newDataset = surprise(dataset1,dataset2);
+		var newDataset = surprise(dataset1,dataset2,stdFunc);
 		window.datasets.set( prompt("Dataset name ?") , newDataset );
 		
 		displayDatasetPicker();
