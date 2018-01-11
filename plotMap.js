@@ -110,6 +110,11 @@ function plotMap(geoJson, data, svgId){
 		.on("mouseout", function(d){
 			  mouseouttooltip.call(this, d);
 		})
+		.on("click",function(d){
+			var filtering = entry=>entry.polygon_id==d.properties.polygon_id;
+			console.log(data.filter(filtering));
+			plotCalendar(data.filter(filtering),"heatmap")
+		})
 		.merge(g.selectAll("path").data(geoJson))
 		.transition(500)
 		.style("fill", function(d) {

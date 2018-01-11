@@ -50,7 +50,6 @@ function d3_rebind(target, source, method) {
                     date = d3.timeFormat('%b %d');
                     
                 var svg = d3.select(this)
-                    .append('svg')
                         .attr('class','chart')
                         .attr('width', width + margin.left + margin.right)
                         .attr('height', height + margin.top + margin.bottom)
@@ -69,17 +68,21 @@ function d3_rebind(target, source, method) {
                     .attr('text-anchor', 'middle')
                     .attr('font-weight', 'bold')
                     .text(function(d) { return d; });
-
+				
                 var rect = year.selectAll('.day')
                     .data(function (d) { 
-                      return (d === moment().year()) ? d3.timeDays(new Date(d, 0, 1), new Date(d , moment().month(), moment().date())) : d3.timeDays(new Date(d, 0, 1), new Date(d + 1, 0, 1)); 
-                    })
-                    .enter().append('rect')
-                        .attr('class', 'day')
-                        .attr('width', sizeByDay)
-                        .attr('height', sizeByDay)
-                        .attr('x', function(d) { return week(d) * sizeByDay; })
-                        .attr('y', function(d) { return day(d) * sizeByDay; });
+                      var daysArray = (d === moment().year()) ? d3.timeDays(new Date(d, 0, 1), new Date(d , moment().month(), moment().date())) : d3.timeDays(new Date(d, 0, 1), new Date(d + 1, 0, 1)); 
+                      return daysArray.map(function(day){
+						  return {
+							  datetime: day,
+							  value: nestedData["$"+day] ? nestedData["$"+day] : 0
+						  };
+					  });
+                    });
+                    
+                console.log(rect);
+                    
+                    
 
               
 
@@ -139,20 +142,27 @@ function d3_rebind(target, source, method) {
 
                 // apply the heatmap colours
                 colour.domain(d3.extent(d3.values(nestedData)));
-
-                rect.filter(function (d) {
-                        return "$"+d in nestedData; 
-                    })
-                    .style('fill', function (d) { 
-                        return colour(nestedData["$"+d]); 
-                    })
-                    .on('mouseover', function (d, i) {
+				
+				console.log(rect);
+				rect.exit().remove();
+                rect.enter().append('rect')
+                        .attr('class', 'day')
+                        .attr('width', sizeByDay)
+                        .attr('height', sizeByDay)
+                        .attr('x', function(d) { return week(d.datetime) * sizeByDay; })
+                        .attr('y', function(d) { return day(d.datetime) * sizeByDay; })
+                        .on('mouseover', function (d, i) {
 						  var f = d3.timeFormat('%B %d, %Y');
 						  d3.select('#info')
 							  .text(function () {
-								  return 'date: ' + f(d) + ' | value: ' + nestedData["$"+d];
+								  return 'date: ' + f(d.datetime) + ' | value: ' + d.value;
 							  });
-					  });
+					  })
+					  .style('fill', function (d) { 
+                        return colour(d.value); 
+                    });
+                    
+                    
             });
         }
         
