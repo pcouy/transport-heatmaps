@@ -28,13 +28,28 @@
       <span id="info">info</span> 
     </header>
 	<svg width="800" height="600" id="svgMap"></svg>
-    <svg id="heatmap" width="800" height="600" ></section>
-  </div> 
+    <section id="heatmap" width="800" height="600" ></section>
+  </div>
+
+  <div id="reset_button">
+    <input name="resetButton" 
+           type="button" 
+           value="Reset"
+           onclick="resetData()"/>
+	</div> 
 
   <script> d3.eesur = {}; //namespace  </script>
   <script src="d3_code_heatmap_cal.js"></script>
   <script>
-	  
+
+
+ var orig_data;
+ var orig_geojson;
+
+ function resetData() {
+ 	plotMap(orig_geojson, orig_data, "svgMap");
+}
+
       var parseDate = d3.timeParse('%m/%d/%Y');
 	  (function(){
 		  'use strict';
@@ -77,6 +92,9 @@ d3.csv("calendar/data/uber_all_data.csv", function(data) {
 		 *points : liste d'objets possédant au moins un attribut latitude et un attribut longitude
 		*/
 		data = coordsToPolygonId(data, geoJson);
+		orig_data = data;
+		orig_geojson = geoJson
+
 		plotMap(geoJson, data, "svgMap");
 		plotCalendar(data, "heatmap");
 	});
