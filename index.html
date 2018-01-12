@@ -47,6 +47,13 @@
 	<a href="#!" id="saveTimeFilter">Save time filtering as dataset</a><br>
 	<input type="checkbox" id="toggleDivergingScale"><label for="toggleDivergingScale">Toggle diverging scale on next update</label>
 	<hr>
+	<p>Run function on dataset and save return value :</p>
+	<select id="select_customCode"></select>
+	<p>function transformDataset(dataset){<br>
+		<textarea id="customCode" style="margin-left:20px;width:400px">transformedDataset = dataset.filter(d=>d.polygon_id==1);
+return transformedDataset;</textarea><br>
+	} <a href="#!" onclick="applyCodeToData()">Apply</a></p>
+	<hr>
   </div>
 
  
@@ -123,8 +130,7 @@ d3.csv("calendar/data/uber_all_data.csv", function(data) {
 		orig_geojson = geoJson;
 		setOrigDataset(orig_data);
 		window.datasets.set("uber_orig", orig_data);
-		displayDatasetPicker();
-		displayDatasetMerger();
+		updateDatasetLists();
 
 		plotMap(geoJson, data, "svgMap");
 		plotCalendar(data, "heatmap");

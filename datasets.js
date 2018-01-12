@@ -1,3 +1,24 @@
+function applyCodeToData(){
+	eval('var customFunction = function(dataset){'+$('#customCode').val()+'}');
+	var dataset = window.datasets.get( $('#select_customCode').val() );
+	window.datasets.set( prompt("Dataset name ?"), customFunction( dataset ) );
+	updateDatasetLists();
+}
+
+function updateDatasetLists(){
+	displayDatasetPicker();
+	displayDatasetMerger();
+	displayDatasetComparer();
+	displayDatasetList("select_customCode");
+}
+
+function displayDatasetList(selectId){
+	$('#'+selectId).html("");
+	for(dataset of window.datasets){
+		$('#'+selectId).append('<option value="'+dataset[0]+'">'+dataset[0]+'</option>')
+	}
+}
+
 function displayDatasetPicker(){
 	$('#dataset_picker').remove();
 	$('#ui').append('<div id="dataset_picker"></div><hr>');
@@ -9,6 +30,7 @@ function displayDatasetPicker(){
 		});
 	}
 }
+
 
 function displayDatasetComparer(){
 	$('#dataset_comparer').remove();
@@ -25,9 +47,7 @@ function displayDatasetComparer(){
 		var newDataset = surprise(dataset1,dataset2,stdFunc);
 		window.datasets.set( prompt("Dataset name ?") , newDataset );
 		
-		displayDatasetPicker();
-		displayDatasetMerger();
-		displayDatasetComparer();
+		updateDatasetLists();
 	});
 }
 
@@ -45,9 +65,7 @@ function displayDatasetMerger(){
 		var newDataset = dataset1.concat(dataset2);
 		window.datasets.set( prompt("Dataset name ?") , newDataset );
 		
-		displayDatasetPicker();
-		displayDatasetMerger();
-		displayDatasetComparer();
+		updateDatasetLists();
 	});
 }
 
@@ -63,9 +81,7 @@ function setOrigDataset(dataset){
 			return result;
 		};
 		window.datasets.set(prompt("Dataset name ?"), dataset.filter(filtering));
-		displayDatasetPicker();
-		displayDatasetMerger();
-		displayDatasetComparer();
+		updateDatasetLists();
 	});
 	$('#saveTimeFilter').click(function(){
 		var filtering = function(entry){
@@ -79,8 +95,6 @@ function setOrigDataset(dataset){
 			return result;
 		};
 		window.datasets.set(prompt("Dataset name ?"), dataset.filter(filtering));
-		displayDatasetPicker();
-		displayDatasetMerger();
-		displayDatasetComparer();
+		updateDatasetLists();
 	});
 }
