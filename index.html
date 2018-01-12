@@ -35,13 +35,34 @@
 		<div style="height: 100px;position: relative;bottom: 150px;"><p id="ref_heatmap" ><a href="http://bl.ocks.org/eesur/5fbda7f410d31da35e42">Code adapté de Sundar’s block</a></p></div>
   </svg>
     </div>
-  <div id="ui" style="position:absolute;top:40px;right:20px;">
+  <div id="ui" style="position:absolute;top:40px;right:20px;bottom:20px;overflow:scroll;">
 	 <div id="reset_button">
     <input name="resetButton" 
            type="button" 
            value="Reset"
            onclick="resetData()"/>
 	</div> 
+	<hr>
+	<p>
+		Load dataset : <input type="file" id="loadFile"><br>
+		<select id="loadFile_type">
+			<option value="csv">CSV</option>
+			<option value="json">JSON</option>
+		</select><br>
+		function preprocess(data){<br>
+		<textarea style="margin-left:20px;width:400px;"id="loadFile_preprocess">data = data.map(function(d){
+	d.latitude = d.Lat;
+	d.longitude = d.Lon;
+	d.time_begin = parseDate(d.datetime.split(' ')[0]).getTime()/1000;
+	d.time_end = parseDate(d.datetime.split(' ')[0]).getTime()/1000+3600;
+	d.value = 1;
+	return d;
+});
+dataset = coordsToPolygonId(data, window.geoJson);
+return dataset;</textarea><br>
+		}
+		<a href="#!" id="loadFile_add">Add dataset</a><br>
+	</p>
 	<hr>
 	<a href="#!" id="saveMapFilter">Save district filtering as dataset</a><br>
 	<a href="#!" id="saveTimeFilter">Save time filtering as dataset</a><br>

@@ -5,6 +5,37 @@ function applyCodeToData(){
 	updateDatasetLists();
 }
 
+function importFile() {
+  var file = document.getElementById('loadFile').files[0];
+  if (!file) {
+    return;
+  }
+  var fileType = $('#loadFile_type').val();
+  var parseFunction;
+  if(fileType=='csv'){
+	  console.log('csv');
+	  parseFunction = d3.csvParse;
+  }else if(fileType=='json'){
+	  console.log('json');
+	  parseFunction = eval;
+  }else{
+	  console.log('???');
+	  return;
+  }
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    var contents = e.target.result;
+    eval('var preprocessingFunction = function(data){'+$('#loadFile_preprocess').val()+'}');
+    window.datasets.set( prompt('Dataset name ?'), preprocessingFunction(parseFunction(contents)) );
+    updateDatasetLists();
+  };
+  reader.readAsText(file);
+}
+$(document).ready(function(){
+	$('#loadFile_add').click(importFile);
+});
+
+
 function updateDatasetLists(){
 	displayDatasetPicker();
 	displayDatasetMerger();
